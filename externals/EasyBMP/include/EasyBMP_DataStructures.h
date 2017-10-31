@@ -3,7 +3,7 @@
 *  EasyBMP Cross-Platform Windows Bitmap Library *
 *                                                *
 *  Author: Paul Macklin                          *
-*   email: macklin01@users.sourceforge.net       *
+*   email: macklin01@users.sourceforge.net       *task2
 * support: http://easybmp.sourceforge.net        *
 *                                                *
 *          file: EasyBMP_DataStructures.h        *

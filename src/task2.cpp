@@ -10,6 +10,7 @@
 #include "linear.h"
 #include "argvparser.h"
 #include "matrix.h"
+#include "usr2.h"
 
 using std::string;
 using std::vector;
@@ -25,6 +26,7 @@ using std::get;
 using CommandLineProcessing::ArgvParser;
 
 typedef vector<pair<BMP*, int> > TDataSet;
+typedef vector<pair<Image*, int> > TImageDataSet;
 typedef vector<pair<string, int> > TFileList;
 typedef vector<pair<vector<float>, int> > TFeatures;
 
@@ -67,7 +69,20 @@ void LoadImages(const TFileList& file_list, TDataSet* data_set) {
         data_set->push_back(make_pair(image, file_list[img_idx].second));
     }
 }
+/*
+void LoadImagesGrayScale(const TFileList& file_list, TImageDataSet* data_set) {
+    for (size_t img_idx = 0; img_idx < file_list.size(); ++img_idx) {
+            // Create image
+        BMP* image = new BMP();
+            // Read image from file
+        image->ReadFromFile(file_list[img_idx].first.c_str());
+            // Add image and it's label to dataset
 
+        Image res = grayscale_from_BMP(*image);
+        data_set->push_back(make_pair(&res, file_list[img_idx].second));
+    }
+}
+*/
 // Save result of prediction to file
 void SavePredictions(const TFileList& file_list,
                      const TLabels& labels, 
@@ -87,7 +102,7 @@ void GrayScale(const TDataSet& data_set){
         int borderH = 0, borderW = 0;
         uch clr = 0;
         for (size_t image_idx = 0; image_idx < data_set.size()-1; ++image_idx) {
-        cout << "1 pixel " << data_set.size() << " image " << image_idx;
+        // cout << "1 pixel " << data_set.size() << " image " << image_idx;
             borderH = get<0>(data_set.at(image_idx))->TellHeight();
             for (int i = 0; i < borderH - 1; ++i)
             {
@@ -112,15 +127,91 @@ void GrayScale(const TDataSet& data_set){
         }
 }
 
+void SobelConvolutionOld(TDataSet& data_set){
+    std::vector<int> sobel_x = {-1, 0, 1,/*вторая строка*/ -2, 0, 2,/*третья строка*/ -1, 0, 1} ;
+    std::vector<int> sobel_y = {-1, -2, -1,/*вторая строка*/ 0, 0, 0,/*третья строка*/ 1, 2, 1} ;
+// getpixel(a,b) - a - width;  b -  height
+    TDataSet data_set_y;
+    std::vector<int> pixel(4);
+    int borderH = 0, borderW = 0;
+    // uch clr = 0;
+    RGBApixel pix_x = RGBApixel();
+    RGBApixel pix_y = RGBApixel();
+    for (size_t image_idx = 0; image_idx < data_set.size()-1; ++image_idx) {
+        data_set.at(image_idx) = make_pair(get<0>(data_set.at(image_idx)),get<1>(data_set.at(image_idx)));
+
+        cout << "1 pixel - NEW dataset" << data_set_y.size() << " image " << image_idx;
+        borderH = get<0>(data_set.at(image_idx))->TellHeight();
+        for (int i = 1; i < borderH - 1; ++i)
+        {
+            // cout << "\n  i " << i << " borderW " << borderW << " borderH " << borderH << "size: height: " <<"\n";
+            borderW = get<0>(data_set.at(image_idx))->TellWidth();
+            for (int j = 1; j < borderW - 1; ++j)
+                {
+                    for (uint l = 0; l < 3; ++l)
+                    {
+                        for (uint k = 0; k < 3; ++k)
+                        {
+                            // pix = get<0>(data_set.at(image_idx))->GetPixel(j,i);
+                            pix_x.Red +=  get<0>(data_set.at(image_idx))->GetPixel(j - 1 + k,i - 1 + l).Red * sobel_x.at(k * 3 + l);
+                            pix_x.Green +=  get<0>(data_set.at(image_idx))->GetPixel(j - 1 + k,i - 1 + l).Green * sobel_x.at(k * 3 + l);
+                            pix_x.Blue +=  get<0>(data_set.at(image_idx))->GetPixel(j - 1 + k,i - 1 + l).Blue * sobel_x.at(k * 3 + l);
+                            pix_y.Red +=  get<0>(data_set.at(image_idx))->GetPixel(j - 1 + k,i - 1 + l).Red * sobel_y.at(k * 3 + l);
+                            pix_y.Green +=  get<0>(data_set.at(image_idx))->GetPixel(j - 1 + k,i - 1 + l).Green * sobel_y.at(k * 3 + l);
+                            pix_y.Blue +=  get<0>(data_set.at(image_idx))->GetPixel(j - 1 + k,i - 1 + l).Blue * sobel_y.at(k * 3 + l);
+
+                            // pixel.at(chnl) = 
+                             // += get<0> (image(i -1 + k,j - 1 + l)) * kernel.at(k * 3 + l);
+                            // pixel.at(chnl + 1) += get<1> (image(i -1 + k,j - 1 + l)) * kernel.at(k * 3 + l);
+                            // pixel.at(chnl + 2) += get<2> (image(i -1 + k,j - 1 + l)) * kernel.at(k * 3 + l);
+                                                      
+                        }
+                    }
+                    get<0>(data_set.at(image_idx))->SetPixel(j,i, pix_x);
+                    get<0>(data_set_y.at(image_idx))->SetPixel(j,i, pix_y);
+
+
+
+
+                    // cout << " j " << j << "; width " << get<0>(data_set.at(image_idx))->TellWidth();
+                    // RGBApixel pix2 = get<0>(data_set.at(image_idx))->GetPixel(j,i);
+                    // cout << " red " << (uint)pix2.Red << "  green " << (uint)pix2.Green << " blue " << (uint)pix2.Blue << "\n";
+                }    
+        }
+
+        // cout << image_idx <<"  pixel " <<static_cast<int>(get<0>(data_set.at(image_idx))->TellWidth()) << "\n ";
+    }    
+
+}
+
+void SobelConvolution(TDataSet& data_set){
+    // int borderH = 0, borderW = 0;
+    // uch clr = 0;
+    for (size_t image_idx = 0; image_idx < data_set.size()-1; ++image_idx) {
+
+    }
+    }
 // Exatract features from dataset.
 // You should implement this function by yourself =)
 void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
     GrayScale(data_set);
     cout << "Я сделаль!\n";
     features = features;
-
+    BMP* temp ;
+    for (size_t image_idx = 0; image_idx < data_set.size()-1; ++image_idx) {
+        // *data_set.at(image_idx).first = 
+        temp =new BMP();
+        temp = data_set.at(image_idx).first;
+        Rescale(temp,'w',64);
+    cout << " новые размеры ищоюражегия 3: " << temp.TellWidth( )<< " и высота: "<< temp.TellHeight();
+        
+        Rescale(*data_set.at(image_idx).first,'h',64);
+    cout << " новые размеры ищоюражегия 3: " << get<0>(data_set.at(image_idx))->TellWidth( )<< " и высота: "<< get<0>(data_set.at(image_idx))->TellHeight();
+        if(get<0>(data_set.at(image_idx))->TellHeight() < 64) cout << "ПИДАРАСЫ!!!! "<< get<0>(data_set.at(image_idx))->TellHeight();
+        delete &temp;
+    }
     RGBApixel pix2 = get<0>(data_set.at(1))->GetPixel(20,20);
-                        cout << " red " << (uint)pix2.Red << "  green " << (uint)pix2.Green << " blue " << (uint)pix2.Blue << "\n";
+                        cout << " red " << static_cast<int>(pix2.Red) << "  green " <<static_cast<int>( pix2.Green) << " blue " << static_cast<int>( pix2.Blue) << "\n";
     /*const char ci = 0;
 std::cout << typeid(ci).name() << '\n';
         int i = 0;
