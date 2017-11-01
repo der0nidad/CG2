@@ -12,6 +12,7 @@
 #include "matrix.h"
 #include "usr2.h"
 
+
 using std::string;
 using std::vector;
 using std::ifstream;
@@ -194,10 +195,18 @@ void SobelConvolution(TDataSet& data_set){
 // Exatract features from dataset.
 // You should implement this function by yourself =)
 void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
-    GrayScale(data_set);
-    cout << "Я сделаль!\n";
+    // GrayScale(data_set);
     features = features;
-    BMP* temp ;
+    Matrix<float> tempp = grayscale_Matrix_from_BMP(*data_set.at(0).first);
+    Matrix<float> tempp2 = tempp;
+    tempp = Sobel_X_Img(tempp);
+    tempp2 = Sobel_Y_Img(tempp2);
+    tempp2 = SobelConvolutionImg(tempp, tempp2);
+    save_Matrix( tempp2, "/home/vorch/CGTESTS/1.bmp");
+    cout << "Я сделаль!\n";
+
+
+    /*BMP* temp ;
     for (size_t image_idx = 0; image_idx < data_set.size()-1; ++image_idx) {
         // *data_set.at(image_idx).first = 
         temp =new BMP();
@@ -212,7 +221,7 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
     }
     RGBApixel pix2 = get<0>(data_set.at(1))->GetPixel(20,20);
                         cout << " red " << static_cast<int>(pix2.Red) << "  green " <<static_cast<int>( pix2.Green) << " blue " << static_cast<int>( pix2.Blue) << "\n";
-    /*const char ci = 0;
+    *//*const char ci = 0;
 std::cout << typeid(ci).name() << '\n';
         int i = 0;
     for (size_t image_idx = 0; image_idx < data_set.size()-1; ++image_idx) {
