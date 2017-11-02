@@ -1,4 +1,3 @@
-train/droid/222.bmp 1
 train/droid/0001.bmp 1
 train/droid/0002.bmp 1
 train/droid/0003.bmp 1
