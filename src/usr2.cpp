@@ -165,27 +165,21 @@ std::pair<int,int> Calc_Max_Wid_Heig(const vector<pair<BMP*, int> > & data_set){
     std::pair<int,int> res;
     res.first = 0;
     res.second = 0;
-    int i =0;
     int maxHeight = 0, maxWidth = 0, curr_height = 0, curr_width = 0;
     int countW = 0, countH = 0;
     countW = countW;
         for (size_t image_idx = 0; image_idx < data_set.size()-1; ++image_idx) {
          curr_width = (data_set.at(image_idx).first)->TellWidth();
          curr_height= data_set.at(image_idx).first->TellHeight();
-        // curr_height > maxHeight ? maxHeight = curr_height;  countH = image_idx: 1;
         if(curr_height >= maxHeight){
              maxHeight = curr_height;  countH = image_idx;
 
-             // cout<< "ПИДОР2 " << maxHeight << " " << countH << "\n" ;
         }
         curr_width> maxWidth ? maxWidth= curr_width: 1;
         if(curr_width>= maxWidth){
             maxWidth= curr_width;
             countW = image_idx;
-             cout<< "ПИДОР1 " << maxWidth<< " " << countW << "\n";
-            // cout<< "ПИДОР";
         }
-        cout << i++ << " " ;
     }
     cout << "номер на кот макс ширина " <<  countW << "\n";
     cout << "номер на кот макс высота " <<  countH << "\n";
@@ -214,7 +208,8 @@ std::vector<float> Calc_Histogram(Matrix<float>& module, Matrix<float>& angle){
     for(int hei = 0; hei < 8 ; hei++){
         for (int wid = 0; wid < 8; wid++)
         {
-    std::array<int, NUMB_OF_SEG> hist;
+            cout << "НАЧАЛОА";
+    std::vector<float> hist(NUMB_OF_SEG, 0);
             cout << ++mm << "  ";
             hist = Calc_Cell_Hist(module, angle, 10,10,20,20);
             for (int i = 0; i < NUMB_OF_SEG; ++i)
@@ -226,64 +221,13 @@ std::vector<float> Calc_Histogram(Matrix<float>& module, Matrix<float>& angle){
     }
     cout << "КОЛИЧЕСТВО ЭЛЕМЕНТОВ В HIST0  " << hist0.size() << "  " ;
 
-/*
-*/
 
-
-
-
-
-
-
-
-
-    /*for (uint i = 9; i < module.n_rows - 8 ; ++i)
-    {
-        for (uint j= 9; j < module.n_cols - 8; ++j)
-        {
-            //8x8 клеток
-            for (uint k = 0; k < 8; ++k)
-            {
-                for (uint l = 0; l < 8; ++l)
-                {
-                    seg = angle(i - (4 + k),j - (4 + l));
-                    cout << "ШОМОШЕК";
-                    seg /= angleOne;
-                    cout << " seg " << seg << "\n";
-                    // pixel.at(chnl) += (image(i -1 + k,j - 1 + l)) * kernel.at(k * 3 + l);
-                }
-            }
-
-        }
-    }
-
-
-for (int i = 0; i < 8; ++i)
-    {
-        for (int j = 0; i < 8; ++j)
-        {
-                // std::array<int, NUMB_OF_SEG> Calc_Cell_Hist(Matrix<float>& module,Matrix<float>& angle, uint begHeight, uint begWidth, uint endHeight, uint endWidth)
-            // hist = Calc_Cell_Hist(module, angle , cell_size_H * i, cell_size_W * j, cell_size_H * (i + 1), cell_size_W * (j + 1) );
-            for (int k = 0; k < NUMB_OF_SEG; ++k)
-            {
-                // hist0.push_back(hist[k]);
-            }
-
-        }
-    }
-
-
-
-
-    */
     return hist0;
 }
 
-    std::array<int, NUMB_OF_SEG> Calc_Cell_Hist(Matrix<float>& module,Matrix<float>& angle, uint begHeight, uint begWidth, uint endHeight, uint endWidth){
-    std::vector<float> hist0;
+    std::vector<float> Calc_Cell_Hist(Matrix<float>& module,Matrix<float>& angle, uint begHeight, uint begWidth, uint endHeight, uint endWidth){
     int size = NUMB_OF_SEG;//кол-во сегментов
-    std::array<int, NUMB_OF_SEG> hist;
-    hist = hist;
+    std::vector<float> hist(NUMB_OF_SEG,0);
     // uint cell_width = module.n_cols / 8;
     // uint cell_height  = module.n_rows / 8;
     int seg = 0;//0..7
@@ -296,8 +240,10 @@ for (int i = 0; i < 8; ++i)
         {
                     seg = angle(i, j);
                     seg /= angleOne;
-                    hist[seg] += module(i,j);
-            cout << seg << "  ";
+                    seg+=( NUMB_OF_SEG ) / 2;
+            cout << seg << "@  ";
+            if(abs(seg) > 7) {cout << seg << " - вот оно ; \n";}else{
+                    hist.at(seg) += module(i,j);}
                     // cout << " seg " << seg << "\n";
         }
     }
@@ -314,9 +260,7 @@ Matrix<float> resModule = Matrix<float>(image.n_rows, image.n_cols);
 // vector<Matrix<float>> resVect  = vector<Matrix<float>>(2);
     // Image kernel(3,3);
     // int chnl = 0;
-cout <<"\n\n";
-    cout << static_cast<float>(-179.f / 45);
-cout <<"\n\n";
+
     float X = 0, Y = 0;
     float module = 0, angle = 0;
     float xxx = 0;
@@ -401,9 +345,9 @@ Matrix<float> grayscale_Matrix_from_BMP(BMP & in){
         for (uint j = 0; j < res.n_cols; ++j) {
             RGBApixel *p = in(j, i);
             pix = calc_brightness_gray(p->Blue, p->Green, p->Red);
-            p->Red = pix;
+            /*p->Red = pix;
             p->Green= pix;
-            p->Blue = pix;
+            p->Blue = pix;*/
             res(i, j) = pix;
         }
     }

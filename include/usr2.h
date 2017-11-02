@@ -24,6 +24,6 @@ Matrix<float> SobelConvolutionImg2(Matrix<float>& image, Matrix<float> &resAngle
 
 std::vector<float> Calc_Histogram(Matrix<float>& module, Matrix<float>& angle);
 
-std::array<int, 8> Calc_Cell_Hist(Matrix<float>& module,Matrix<float>& angle, uint begHeight, uint begWidth, uint endHeight, uint endWidth);
+std::vector<float> Calc_Cell_Hist(Matrix<float>& module,Matrix<float>& angle, uint begHeight, uint begWidth, uint endHeight, uint endWidth);
 
 std::pair<int,int> Calc_Max_Wid_Heig(const std::vector<std::pair<BMP*, int> > & data_set);

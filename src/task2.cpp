@@ -205,7 +205,6 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
     // tempp = Sobel_X_Img(tempp);
     // tempp2 = Sobel_Y_Img(tempp2);
     tempp = SobelConvolutionImg2(tempp, tempp2);
-    cout << "Геййййй";
     Calc_Histogram(tempp, tempp2);
     cout << "Размер матрицы " << tempp.n_rows << " размер дотосетного элемента  " << data_set.at(0).first->TellHeight() << " ширина элемента  " << data_set.at(0).first->TellWidth();
     save_Matrix( tempp, "/home/vorch/CGTESTS/1.bmp");
