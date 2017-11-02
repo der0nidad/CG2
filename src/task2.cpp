@@ -197,6 +197,8 @@ void SobelConvolution(TDataSet& data_set){
 void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
     // GrayScale(data_set);
     features = features;
+    std::vector<float> feat;
+    std::vector<float> feat0;
     pair < int, int > huge = Calc_Max_Wid_Heig(data_set);
     cout << "Макс высота: " << huge.second << ",  ширина:  " << huge.first << "!";
     Matrix<float> tempp = grayscale_Matrix_from_BMP(*data_set.at(0).first);
@@ -205,8 +207,13 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
     // tempp = Sobel_X_Img(tempp);
     // tempp2 = Sobel_Y_Img(tempp2);
     tempp = SobelConvolutionImg2(tempp, tempp2);
-    Calc_Histogram(tempp, tempp2);
-    cout << "Размер матрицы " << tempp.n_rows << " размер дотосетного элемента  " << data_set.at(0).first->TellHeight() << " ширина элемента  " << data_set.at(0).first->TellWidth();
+    feat = Calc_Histogram(tempp, tempp2);
+    for (uint i = 0; i < feat.size(); ++i)
+    {
+        feat0.push_back(feat.at(i));
+    }
+    // cout << "Размер матрицы " << tempp.n_rows << " размер дотосетного элемента  " << data_set.at(0).first->TellHeight() << " ширина элемента  " << data_set.at(0).first->TellWidth();
+    cout << "Размер векутора признаков  " << feat0.size();
     save_Matrix( tempp, "/home/vorch/CGTESTS/1.bmp");
     save_Matrix( tempp2, "/home/vorch/CGTESTS/11.bmp");
     cout << "Я сделаль!\n";

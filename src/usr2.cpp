@@ -200,7 +200,7 @@ std::vector<float> Calc_Histogram(Matrix<float>& module, Matrix<float>& angle){
     cell_size_H = cell_size_H;
     cell_size_W = cell_size_W;
     seg = seg;
-    int mm =0 ;
+    float sum =0.f ;
     float angleOne = 360.f / size;
     angleOne = angleOne;
 
@@ -208,15 +208,26 @@ std::vector<float> Calc_Histogram(Matrix<float>& module, Matrix<float>& angle){
     for(int hei = 0; hei < 8 ; hei++){
         for (int wid = 0; wid < 8; wid++)
         {
-            cout << "НАЧАЛОА";
     std::vector<float> hist(NUMB_OF_SEG, 0);
-            cout << ++mm << "  ";
-            hist = Calc_Cell_Hist(module, angle, 10,10,20,20);
+            // cout << ++mm << "  \n";
+            hist = Calc_Cell_Hist(module, angle, cell_size_H * hei, cell_size_W * wid , cell_size_H * (hei + 1),  cell_size_W * (wid + 1));
             for (int i = 0; i < NUMB_OF_SEG; ++i)
             {
-                cout << "сегмент " << i << "  значенеи " << hist[i] << "\n"    ;
+                cout << "ДО НОРМИРОВАНИЯ сегмент " << i << "  значенеи " << hist.at(i) << "\n"    ;
+                // нормализуем здесь
+                // hist.at(i) = hist.at(i) * hist.at(i);
+                sum += hist.at(i)  * hist.at(i);
+                // hist0.push_back(hist.at(i));
             }
-            
+            sum = sqrt(sum);
+            for (int i = 0; i < NUMB_OF_SEG; ++i)
+            {
+                // нормализуем здесь
+                hist.at(i) =( hist.at(i) / sum);
+                hist0.push_back(hist.at(i));
+                cout << "ПОСЛЕ НОРМИРОВАНИЯ сегмент " << i << "  значенеи " << hist.at(i) << "\n"    ;
+
+            }
         }
     }
     cout << "КОЛИЧЕСТВО ЭЛЕМЕНТОВ В HIST0  " << hist0.size() << "  " ;
@@ -240,8 +251,8 @@ std::vector<float> Calc_Histogram(Matrix<float>& module, Matrix<float>& angle){
         {
                     seg = angle(i, j);
                     seg /= angleOne;
-                    seg+=( NUMB_OF_SEG ) / 2;
-            cout << seg << "@  ";
+                    seg+=( NUMB_OF_SEG -1) / 2;//все, вот так правильно!
+            // cout << seg << "@  ";
             if(abs(seg) > 7) {cout << seg << " - вот оно ; \n";}else{
                     hist.at(seg) += module(i,j);}
                     // cout << " seg " << seg << "\n";
